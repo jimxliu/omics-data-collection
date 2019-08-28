@@ -39,9 +39,8 @@ sample_tbl[1, "accession"]
 # get title of the first sample dataset
 title <- sample_tbl[1, "title"]
 # split and reformat title
-condition <- strsplit(title, "\\s+-\\s+")[[1]][2]
-condition <- gsub(" ", "-", condition)
-condition
+title <- gsub(" ", "_", title)
+
 
 #### Process the all sample datasets in bulk ######
 
