@@ -5,8 +5,8 @@ library(GEOquery)
 res <- entrez_search(db='gds', term='Zea mays [Organism] AND expression profiling by high throughput sequencing[DataSet Type]', use_history=TRUE)
 res$count
 # Get number of GSE records
-# n_records = res$count
-n_records = 5 
+n_records = res$count
+# n_records = 5 
 res <- entrez_search(db='gds', term='Zea mays [Organism] AND expression profiling by high throughput sequencing[DataSet Type]', retmax=n_records, use_history=TRUE)
 summary(res)
 
@@ -20,32 +20,32 @@ gse_list
 
 
 # Process each GSE
-# for (i in 1:n_records){
-for (i in 1:1){
+for (i in 1:n_records){
+# for (i in 1:1){
    
    # Get GSE accession number
    gse_access <- paste0("GSE",gse_list["gse",i])
    print(paste0("Processing: ", gse_access))
    
    # Create GSE-specific directory to store data
-   dname <- paste0("./", gse_access)
+   dname <- paste0("./data/", gse_access)
    if(dir.exists(dname)){
       unlink(dname, recursive = TRUE)
    }
-   dir.create(dname)
+   dir.create(dname, recursive = TRUE)
    
    # Get the GSM-title mapping
    sample_map <- gse_list["samples",i][[1]]
    
    # Store the mapping
-   write.csv(sample_map, file = paste0(dname,"/sample_mapping.csv"), row.names = FALSE)
+   # write.csv(sample_map, file = paste0(dname,"/sample_mapping.csv"), sep = ",", row.names = FALSE)
    
    # samples is a data.frame now
    samples <- gse_list["samples", i][[1]] 
   
    # Process each GSM sample
-   # for ( j in 1:nrow(samples)){
-   for ( j in 1:1){
+   for ( j in 1:nrow(samples)){
+   # for ( j in 1:1){
       print(paste0("   Processing: ",samples$accession[j]))
       
       # GSM Accession number
@@ -55,11 +55,18 @@ for (i in 1:1){
       gsm <- getGEO(gsm_access)
       data <- Table(gsm)
       
-      # Store dataset to csv
-      fname <- sprintf("./%s/%s.csv", gse_access,gsm_access) 
-      write.csv(data, file = fname, row.names = FALSE)
+      if(ncol(data) == 0){
+         print(sprintf("%4s","No processed data"))
+         break
+      } else {
+         # Store dataset to csv
+         fname <- sprintf("%s/%s.csv", dname,gsm_access) 
+         write.csv(data, file = fname, sep = ",",row.names = FALSE)
+      }
    }
 }
 
 print("Done")
 
+
+?dir.create
