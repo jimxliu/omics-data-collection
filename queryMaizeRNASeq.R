@@ -5,8 +5,8 @@ library(GEOquery)
 res <- entrez_search(db='gds', term='Zea mays [Organism] AND expression profiling by high throughput sequencing[DataSet Type]', use_history=TRUE)
 res$count
 # Get number of GSE records
-n_records = res$count
-# n_records = 5 
+# n_records = res$count
+n_records = 5
 res <- entrez_search(db='gds', term='Zea mays [Organism] AND expression profiling by high throughput sequencing[DataSet Type]', retmax=n_records, use_history=TRUE)
 summary(res)
 
