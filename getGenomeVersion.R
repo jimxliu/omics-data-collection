@@ -1,5 +1,6 @@
 library(rentrez)
 library(GEOquery)
+library(hash)
 
 # Obtain a list of all GEO series (GSE) associated with Maize and Gene expression profiling.
 organism <- "Zea mays [Organism]"
@@ -27,16 +28,33 @@ gse_list
 
 # Check Genome Version of each GSE (Need to consider GSEs with more than one GV)
 for(id in res$ids){
-   gsm_acc_id <- gse_list['accession', id][[1]][1]
-   gsm <- getGEO(gsm_acc_id)
-   meta <- Meta(gsm)
-   class(meta)
-   names(meta)
-   for(line in meta$data_processing){
-      if(grepl("genome_build", tolower(line), perl=TRUE)) {
-         print(line)
+   samples <- gse_list['accession', id][[1]]
+   print(length(samples))
+   gv_set <- hash()
+   for(gsm_acc_id in samples){
+      gsm <- getGEO(gsm_acc_id)
+      meta <- Meta(gsm)
+      for(line in meta$data_processing){
+         if(grepl("genome_build", tolower(line), perl=TRUE)) {
+            gv_set[line] <- 1    
+         }
       }
    }
+   
+   print(keys(gv_set))
+   clear(gv_set)
+   
+   
+   # gsm_acc_id <- samples[1]
+   # gsm <- getGEO(gsm_acc_id)
+   # meta <- Meta(gsm)
+   # class(meta)
+   # names(meta)
+   # for(line in meta$data_processing){
+   #    if(grepl("genome_build", tolower(line), perl=TRUE)) {
+   #       print(line)
+   #    }
+   # }
 }
 
 
