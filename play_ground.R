@@ -9,9 +9,15 @@ eData
 
 pd <- pData(eData)
 names(pd)
-pd$data_processing.5
+pd$library_strategy
 
-eList2 <- getGEO("GSE98379")
+nlevels(pd$extract_protocol_ch1.2)
+pd$extract_protocol_ch1.2
+
+
+
+
+eList2 <- getGEO("GSE121039")
 class(eList2)
 length(eList2)
 names(eList2)
@@ -20,5 +26,22 @@ eData2
 
 pd2 <- pData(eData2)
 
-pd2["data_processing.6"]
+names(pd2)
+pd2["GSM3424967","contact_city"]
+
+exit <- FALSE
+for(col in colnames(pd2)){
+   for(row in rownames(pd2)) {
+      if(any(grepl("celseq", pd2[row, col], ignore.case = TRUE, perl = TRUE))) {
+         print(col)
+         exit <- TRUE
+         break
+      }
+   }
+   if(exit) break
+}
+
+pd2$extract_protocol_ch1.1
+
+gsm <- getGEo("GSM3424967")
 
