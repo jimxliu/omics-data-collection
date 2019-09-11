@@ -43,22 +43,23 @@ getValidFileLinks <- function(gse) {
    files <- getGEOSuppFiles(gse, fetch_files = FALSE)
    valid_list <- c()
    sapply(1:1, function(row) 
-                  if(isValidFormat(files$fname[row])) {
+                  if(checkType(files$fname[row])) {
                      valid_list <- c(valid_list, row)
                   })
    return(valid_list)
 }
 
-# Function: check whether the filename is valid for processed data
-isValidFormat <- function(fname){
+# Function: check whether the filename is valid for processed datag
+getDataType<- function(fname){
    if(grepl("\\.csv", fname, ignore.case = TRUE, perl = TRUE)) {
       normalized <- "fpkm|rpkm|normalized"
-      raw <- "raw"
-      return(TRUE)
+      return("normalized")
+      raw <- "raw|count"
+      return("raw")
       
    } 
    
-   return(FALSE)
+   return(NA)
 }
 
 fn <- "GSE129683_DESeq2_Bif1Bif4_v_WT_greenhouse2017.csv.gz"
