@@ -40,53 +40,26 @@ for(id in 1:1){
    class(pData(eData))
    df <- pData(eData)
    
-   df["data_processing.3"]
    
    for( name in names(df)){
-      print(name)
+      # print(name)
       
-      if(grepl("data_processing", name, ignore.case = TRUE, perl = TRUE))  
-      # if(grepl("data_processing", name, ignore.case = TRUE, perl = TRUE) & 
-         # any(grepl("genome_build", name, ignore.case = TRUE, perl = TRUE)))
+      if(grepl("data_processing", name, ignore.case = TRUE, perl = TRUE) &&
+         any(grepl("genome_build", df[[name]], ignore.case = TRUE, perl = TRUE)))
       {
          gv_set <- hash() 
-         sapply(df[name], function(line) 
-                           if(str_extract(line, "v[0-9]")){
-                              gv_set[str_extract(line, "v[0-9]")] <- 1               
+         sapply(df[[name]], function(line) 
+                           if(!is.na(str_extract(line, "v[0-9]"))){
+                              gv_set[str_extract(line, "v[0-9]")] <- 1
                            })
-          print(keys(gv_set))
+
+         if(length(gv_set) == 1){
+            print(keys(gv_set)[[1]])
+         }
+         clear(gv_set)
       }
-      # line = eData[name]
-      # if(grepl("genome_build", tolower(line), perl=TRUE)){
-      #    print(line)
-      # }
    }
    
-   # gv_set <- hash()
-   # for(gsm_acc_id in samples){
-   #    gsm <- getGEO(gsm_acc_id)
-   #    meta <- Meta(gsm)
-   #    for(line in meta$data_processing){
-   #       if(grepl("genome_build", tolower(line), perl=TRUE)) {
-   #          gv_set[line] <- 1    
-   #       }
-   #    }
-   # }
-   # if(length(gv_set) == 1){
-   #    print(keys(gv_set)[[1]])
-   # }
-   # clear(gv_set)
-   
-   
-   # gsm_acc_id <- samples[1]
-   # gsm <- getGEO(gsm_acc_id)
-   # meta <- Meta(gsm)
-   # class(meta)
-   # names(meta)
-   # for(line in meta$data_processing){
-   #    if(grepl("genome_build", tolower(line), perl=TRUE)) {
-   #       print(line)
-   #    }
-   # }
+
 }
 
