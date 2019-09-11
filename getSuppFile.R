@@ -1,5 +1,6 @@
 library(rentrez)
 library(GEOquery)
+library(hash)
 
 # Obtain a list of all GEO series (GSE) associated with Maize and Gene expression profiling.
 organism <- "Zea mays [Organism]"
@@ -33,3 +34,32 @@ filePaths
 
 ?getGEOSuppFiles
 colnames(filePaths)
+
+
+# Function: get the valid data files for a GSE 
+# Params: gse (GSE accession number)
+# Return: a list of file download links
+getValidFileLinks <- function(gse) {
+   files <- getGEOSuppFiles(gse, fetch_files = FALSE)
+   valid_list <- c()
+   sapply(1:1, function(row) 
+                  if(isValidFormat(files$fname[row])) {
+                     valid_list <- c(valid_list, row)
+                  })
+   return(valid_list)
+}
+
+# Function: check whether the filename is valid for processed data
+isValidFormat <- function(fname){
+   if(grepl("\\.csv", fname, ignore.case = TRUE, perl = TRUE)) {
+      normalized <- "fpkm|rpkm|normalized"
+      raw <- "raw"
+      return(TRUE)
+      
+   } 
+   
+   return(FALSE)
+}
+
+fn <- "GSE129683_DESeq2_Bif1Bif4_v_WT_greenhouse2017.csv.gz"
+isValidFormat("asfsda_csv")
