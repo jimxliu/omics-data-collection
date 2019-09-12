@@ -44,7 +44,8 @@ downloadValidFiles("GSE111250")
 # Params: gse (GSE accession number)
 # Return: print out downloaed filenames
 downloadValidFiles <- function(gse) {
-   files <- getValidFiles(gse)
+   files <-  getGEOSuppFiles(gse, fetch_files = FALSE)
+   files$fileType <- sapply(files$fname, getDataType)
    for(row in 1:nrow(files)) {
       fileType <- as.character(files[row, "fileType"])
       if(!is.na(fileType)){
@@ -57,15 +58,6 @@ downloadValidFiles <- function(gse) {
    
 }
 
-
-# Function: get the valid data files for a GSE 
-# Params: gse (GSE accession number)
-# Return: a data.frame with columns: fname, url, and fileType
-getValidFiles <- function(gse) {
-   files <- getGEOSuppFiles(gse, fetch_files = FALSE)
-   files$fileType <- sapply(files$fname, getDataType)
-   return(files) 
-}
 
 # Function: check whether the filename is valid for processed datag
 getDataType<- function(fname){
