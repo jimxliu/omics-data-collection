@@ -35,22 +35,20 @@ filePaths
 ?getGEOSuppFiles
 colnames(filePaths)
 
+getValidFiles("GSE111250")
 
 # Function: get the valid data files for a GSE 
 # Params: gse (GSE accession number)
 # Return: a list of file download links
 getValidFiles <- function(gse) {
    files <- getGEOSuppFiles(gse, fetch_files = FALSE)
-   valid_list <- c()
-   sapply(1:1, function(row) 
-                  if(checkType(files$fname[row])) {
-                     valid_list <- c(valid_list, row)
-                  })
-   return(valid_list)
+   sapply(files$fname, getDataType)
+   
 }
 
 # Function: check whether the filename is valid for processed datag
 getDataType<- function(fname){
+   print("Called")
    if(grepl("\\.csv", fname, ignore.case = TRUE, perl = TRUE)) {
       # Patterns
       normalized <- "(?=.*normalized)(?=.*count)"
@@ -60,22 +58,33 @@ getDataType<- function(fname){
       count <- "count"
       if(grepl(normalized, fname, ignore.case = TRUE, perl = TRUE) 
          && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE)) 
-         return("normalized") 
+      {
+         print(paste(fname, "normalized counts"))
+         return()
+      } 
       
       else if(grepl(fpkm, fname, ignore.case = TRUE, perl = TRUE) 
                 && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE))
-         return("fpkm")  
+      {  
+         print(paste(fname, "fpkm")) 
+         return()
+      }
       
       else if(grepl(rpkm, fname, ignore.case = TRUE, perl = TRUE) 
                 && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE))
-         return("rpkm") 
+      {
+         print(paste(fname, "rpkm")) 
+         return()
+      } 
       
       else if(grepl(raw, fname, ignore.case = TRUE, perl = TRUE) 
               || grepl(count, fname, ignore.case = TRUE, perl = TRUE)) 
-         return("raw")
-      
+         
+      {  
+         print(paste(fname, "raw")) 
+         return()
+      }
+
    } 
-   
-   return(NA)
 }
 
