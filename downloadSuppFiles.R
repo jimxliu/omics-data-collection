@@ -36,12 +36,14 @@ filePaths
 ?getGEOSuppFiles
 colnames(filePaths)
 
-getValidFiles("GSE111250")
-
 downloadValidFiles("GSE111250")
 
 # url <- "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE111nnn/GSE111250/suppl//GSE111250_normalized_counts.csv.gz"
 # fname <- "GSE111250_normalized_counts.csv.gz"
+
+# url <- as.character(df[1, "url"])
+# fname <- as.character(df[1, "fname"])
+# download.file(url = url, destfile = paste0("./data/",fname))
 
 
 # Function: download supp csv files for a GSE that follow certain naming patterns
@@ -50,10 +52,10 @@ downloadValidFiles("GSE111250")
 downloadValidFiles <- function(gse) {
    files <- getValidFiles(gse)
    for(row in 1:nrow(files)) {
-      fileType <- files[row, "fileType"]
+      fileType <- as.character(files[row, "fileType"])
       if(!is.na(fileType)){
-         url <- files[row, "url"]
-         fname <- files[row, "fname"]
+         url <- as.character(files[row, "url"])
+         fname <- as.character(files[row, "fname"])
          download.file(url = url, destfile = paste0("./data/",fname))
          print(paste("Downloaded.", "File Name:", fname, ", File Type:", fileType))
       }
