@@ -38,17 +38,11 @@ colnames(filePaths)
 
 downloadValidFiles("GSE111250")
 
-# url <- "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE111nnn/GSE111250/suppl//GSE111250_normalized_counts.csv.gz"
-# fname <- "GSE111250_normalized_counts.csv.gz"
-
-# url <- as.character(df[1, "url"])
-# fname <- as.character(df[1, "fname"])
-# download.file(url = url, destfile = paste0("./data/",fname))
 
 
 # Function: download supp csv files for a GSE that follow certain naming patterns
 # Params: gse (GSE accession number)
-# 
+# Return: print out downloaed filenames
 downloadValidFiles <- function(gse) {
    files <- getValidFiles(gse)
    for(row in 1:nrow(files)) {
