@@ -28,7 +28,8 @@ gse_list
 gse_list["suppfile",1]
 
 
-gse <- "GSE129683"
+# gse <- "GSE129683" # no valid file
+gse <- "GSE111250"
 filePaths <- getGEOSuppFiles(gse, fetch_files = FALSE)
 filePaths
 
@@ -37,18 +38,41 @@ colnames(filePaths)
 
 getValidFiles("GSE111250")
 
+downloadValidFiles("GSE111250")
+
+# url <- "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE111nnn/GSE111250/suppl//GSE111250_normalized_counts.csv.gz"
+# fname <- "GSE111250_normalized_counts.csv.gz"
+
+
+# Function: download supp csv files for a GSE that follow certain naming patterns
+# Params: gse (GSE accession number)
+# 
+downloadValidFiles <- function(gse) {
+   files <- getValidFiles(gse)
+   for(row in 1:nrow(files)) {
+      fileType <- files[row, "fileType"]
+      if(!is.na(fileType)){
+         url <- files[row, "url"]
+         fname <- files[row, "fname"]
+         download.file(url = url, destfile = paste0("./data/",fname))
+         print(paste("Downloaded.", "File Name:", fname, ", File Type:", fileType))
+      }
+   }
+   
+}
+
+
 # Function: get the valid data files for a GSE 
 # Params: gse (GSE accession number)
-# Return: a list of file download links
+# Return: a data.frame with columns: fname, url, and fileType
 getValidFiles <- function(gse) {
    files <- getGEOSuppFiles(gse, fetch_files = FALSE)
-   sapply(files$fname, getDataType)
-   
+   files$fileType <- sapply(files$fname, getDataType)
+   return(files) 
 }
 
 # Function: check whether the filename is valid for processed datag
 getDataType<- function(fname){
-   print("Called")
    if(grepl("\\.csv", fname, ignore.case = TRUE, perl = TRUE)) {
       # Patterns
       normalized <- "(?=.*normalized)(?=.*count)"
@@ -56,35 +80,37 @@ getDataType<- function(fname){
       fpkm <- "fpkm"
       rpkm <- "rpkm"
       count <- "count"
+      
       if(grepl(normalized, fname, ignore.case = TRUE, perl = TRUE) 
          && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE)) 
       {
-         print(paste(fname, "normalized counts"))
-         return()
+         # print(paste(fname, "normalized_counts"))
+         return("normalized_counts")
       } 
       
       else if(grepl(fpkm, fname, ignore.case = TRUE, perl = TRUE) 
                 && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE))
       {  
-         print(paste(fname, "fpkm")) 
-         return()
+         # print(paste(fname, "fpkm")) 
+         return("fpkm")
       }
       
       else if(grepl(rpkm, fname, ignore.case = TRUE, perl = TRUE) 
                 && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE))
       {
-         print(paste(fname, "rpkm")) 
-         return()
+         # print(paste(fname, "rpkm")) 
+         return("rpkm")
       } 
       
       else if(grepl(raw, fname, ignore.case = TRUE, perl = TRUE) 
               || grepl(count, fname, ignore.case = TRUE, perl = TRUE)) 
          
       {  
-         print(paste(fname, "raw")) 
-         return()
+         # print(paste(fname, "raw")) 
+         return("raw")
       }
 
+      return()
    } 
 }
 
