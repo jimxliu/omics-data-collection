@@ -45,7 +45,7 @@ downloadValidFiles("GSE111250")
 # Return: print out downloaed filenames
 downloadValidFiles <- function(gse) {
    files <-  getGEOSuppFiles(gse, fetch_files = FALSE)
-   files$fileType <- sapply(files$fname, getDataType)
+   files$fileType <- sapply(files$fname, getFileType)
    for(row in 1:nrow(files)) {
       fileType <- as.character(files[row, "fileType"])
       if(!is.na(fileType)){
@@ -60,7 +60,7 @@ downloadValidFiles <- function(gse) {
 
 
 # Function: check whether the filename is valid for processed datag
-getDataType<- function(fname){
+getFileType<- function(fname){
    if(grepl("\\.csv", fname, ignore.case = TRUE, perl = TRUE)) {
       # Patterns
       normalized <- "(?=.*normalized)(?=.*count)"
