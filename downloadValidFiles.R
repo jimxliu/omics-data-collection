@@ -8,8 +8,8 @@ downloadValidFiles <- function(gse) {
    files <-  getGEOSuppFiles(gse, fetch_files = FALSE)
    files$fileType <- sapply(files$fname, getFileType)
    for(row in 1:nrow(files)) {
-      fileType <- files[row, "fileType"]
-      if(!is.na(fileType)){
+      fileType <- files$fileType[[row]]
+      if(!is.null(fileType)){
          url <- as.character(files[row, "url"])
          fname <- as.character(files[row, "fname"])
          download.file(url = url, destfile = paste0("./data/",fname))

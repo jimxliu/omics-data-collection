@@ -49,7 +49,7 @@ recsum <- entrez_summary(db='gds', id=res$ids)
 gse_list <- extract_from_esummary(recsum, c('gse'))
 
 
-for(num in gse_list[7:7]){
+for(num in gse_list){
    gse <- paste0("GSE",num)
    
    eList <- getGEO(gse)
@@ -58,8 +58,8 @@ for(num in gse_list[7:7]){
    # dname <- paste0("./data/",gse)
    # dir.create(dname, recursive = TRUE)
    
-   version <- getGenomeVersion(pd) 
-   if(is.na(version)) {
+   version <- getGenomeVersion(pd)
+   if(is.null(version)) {
       next
    }
    if(isSingleCell(pd)){
@@ -67,4 +67,5 @@ for(num in gse_list[7:7]){
    }
    downloadValidFiles(gse)
 }
+
 
