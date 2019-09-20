@@ -2,8 +2,8 @@ library(rentrez)
 library(GEOquery)
 library(hash)
 
-showAllFileFormats <- function(recsum) {
-   supp_format_list <- extract_from_esummary(recsum, c('suppfile'))
+showAllFileFormats <- function(recsums) {
+   supp_format_list <- extract_from_esummary(recsums, c('suppfile'))
    
    supp_format_list
    
@@ -22,4 +22,9 @@ showAllFileFormats <- function(recsum) {
    for(key in keys(format_set)){
       print(sprintf("%s: %d", key, format_set[[key]]))
    }
+}
+
+isMultiTaxon <- function(recsum){
+   mylist <- strsplit(recsum$taxon, "; ")
+   return (length(unlist(mylist)) > 1)
 }

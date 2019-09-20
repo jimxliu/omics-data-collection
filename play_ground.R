@@ -18,3 +18,7 @@ res <- entrez_search(db='gds', term=query ,retmax=res$count, use_history=TRUE)
 recsum <- entrez_summary(db='gds', id=res$ids)
 
 showAllFileFormats(recsum)
+
+rs <- recsum$`200128434`
+isMultiTaxon(rs)
+
