@@ -1,11 +1,20 @@
-library(GEOquery)
 library(rentrez)
 
-files <- getGEOSuppFiles("GSE132620", fetch_files = FALSE)
+source("./util.R")
 
+# Make a query
+organism <- "Zea mays [Organism]"
+datatype <- "expression profiling by high throughput sequencing [DataSet Type]"
+suppfiles <- "(CSV [Supplementary Files])"
+query <- paste(c(organism, datatype), collapse = " AND ")
 
+# Search the first time to get number of GSE records
+res <- entrez_search(db='gds', term=query, use_history=TRUE)
 
+# Search the second time set the max number of records to res$count 
+res <- entrez_search(db='gds', term=query ,retmax=res$count, use_history=TRUE)
 
-recsum <- entrez_summary(db='gds', id="200132620")
+# Summary of returned records.
+recsum <- entrez_summary(db='gds', id=res$ids)
 
-recsum$suppfile
+showAllFileFormats(recsum)
