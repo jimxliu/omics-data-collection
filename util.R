@@ -28,3 +28,33 @@ isMultiTaxon <- function(recsum){
    mylist <- strsplit(recsum$taxon, "; ")
    return (length(unlist(mylist)) > 1)
 }
+
+
+
+getHTSeqSummmaryByOrganism <- function(organism){
+   dataset_type <- "expression profiling by high throughput sequencing"
+   return(getSummary(organism, dataset_type))
+}
+
+
+
+getSummary <- function(organism, dataset_type, suppfile_type = "") {
+   organism <- paste(organism, "[Organism]")
+   dataset_type <- paste(dataset_type, "[DataSet Type]")
+   if(suppfile_type != ""){
+      suppfile_type <- paste(suppfile_type, "[Supplementary Files]")
+   }
+   # Form query
+   query <- paste(c(organism, dataset_type, suppfile_type), collapse = " AND ")
+   
+   # Search the first time to get number of GSE records
+   res <- entrez_search(db='gds', term=query, use_history=TRUE)
+   
+   # Search the second time set the max number of records to res$count 
+   res <- entrez_search(db='gds', term=query ,retmax=res$count, use_history=TRUE)
+
+   # Summary of returned records.
+   recsum <- entrez_summary(db='gds', id=res$ids)
+
+   return(recsum)
+}
