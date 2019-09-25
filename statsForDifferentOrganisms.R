@@ -1,6 +1,10 @@
 library(rentrez)
 source("./util.R")
+
+organisms <- c("Zea mays", "Saccharomyces cerevisiae", "Homo sapiens", "Mus musculus")
+
 organism <- "Zea mays"
 
-getHTSeqSummmaryByOrganism(organism)
+recsum <- getHTSeqSummmaryByOrganism(organism)
 
+total <- length(recsum)
