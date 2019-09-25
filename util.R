@@ -2,8 +2,11 @@ library(rentrez)
 library(GEOquery)
 library(hash)
 
-showAllFileFormats <- function(recsums) {
-   supp_format_list <- extract_from_esummary(recsums, c('suppfile'))
+
+# param: recsum, result of entrez_summary(), esummary_list
+# return: stdout
+showAllFileFormats <- function(recsum) {
+   supp_format_list <- extract_from_esummary(recsum, c('suppfile'))
    
    supp_format_list
    
@@ -24,9 +27,11 @@ showAllFileFormats <- function(recsums) {
    }
 }
 
-isMultiTaxon <- function(recsum){
-   mylist <- strsplit(recsum$taxon, "; ")
-   return (length(unlist(mylist)) > 1)
+# param: recsum, esummary_list
+# return: a list of boolean, indexed by gse_id
+isSingleTaxon <- function(recsum){
+   my_list <- lapply(recsum, function(rec) length(unlist(strsplit(rec$taxon, "; "))) == 1)
+   return(my_list)
 }
 
 
@@ -58,3 +63,70 @@ getSummary <- function(organism, dataset_type, suppfile_type = "") {
 
    return(recsum)
 }
+
+# Function: download supp files for a GSE that follow certain naming patterns
+# Params: gse (GSE accession number)
+# Return: print out downloaed filenames
+downloadValidFiles <- function(gse) {
+   files <-  getGEOSuppFiles(gse, fetch_files = FALSE)
+   files$fileType <- sapply(files$fname, getFileType)
+   for(row in 1:nrow(files)) {
+      fileType <- files$fileType[[row]]
+      if(!is.null(fileType)){
+         url <- as.character(files[row, "url"])
+         fname <- as.character(files[row, "fname"])
+         download.file(url = url, destfile = paste0("./data/",fname))
+         print(paste("Downloaded.", "File Name:", fname, ", File Type:", fileType))
+      }
+   }
+   
+}
+
+
+# param: fname
+# return: file type: diff, norm, fpkm, rpkm, raw
+getFileType<- function(fname){
+   if(!grepl("_raw\\.tar$", fname, ignore.case = TRUE, perl = TRUE)) {
+      # Patterns
+      normalized <- "(?=.*normalized)"
+      raw <- "(?=.*raw)(?=.*count)"
+      fpkm <- "fpkm"
+      rpkm <- "rpkm"
+      diff <- "edgeR|cuffdiff|diff"
+      count <- "count"
+      
+      if(grepl(diff, fname, ignore.case = TRUE, perl = TRUE) )
+      {
+         return("diff")
+      }
+      else if(grepl(normalized, fname, ignore.case = TRUE, perl = TRUE) 
+              && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE)) 
+      {  # normalized counts
+         return("norm")
+      } 
+      
+      else if(grepl(fpkm, fname, ignore.case = TRUE, perl = TRUE) 
+              && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE))
+      {  
+         # print(paste(fname, "fpkm")) 
+         return("fpkm")
+      }
+      
+      else if(grepl(rpkm, fname, ignore.case = TRUE, perl = TRUE) 
+              && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE))
+      {
+         # print(paste(fname, "rpkm")) 
+         return("rpkm")
+      } 
+      
+      else if(grepl(raw, fname, ignore.case = TRUE, perl = TRUE) 
+              || grepl(count, fname, ignore.case = TRUE, perl = TRUE)) 
+         
+      {  
+         # raw counts 
+         return("raw")
+      }
+   } 
+   return()
+}
+
