@@ -3,15 +3,14 @@ library(GEOquery)
 library(hash)
 
 
-# param: recsum, result of entrez_summary(), esummary_list
+# param: results, results of entrez_search(), esearch
 # return: stdout
-showAllFileFormats <- function(recsum) {
-   supp_format_list <- extract_from_esummary(recsum, c('suppfile'))
-   
-   supp_format_list
-   
+showAllFileFormats <- function(results) {
+   supp_format_list <- lapply(results$ids, function(id) {
+                                             recsum <- entrez_summary(db='gds', id=id)
+                                             suppfiles <- extract_from_esummary(recsum, c('suppfile'))
+                                             return(suppfiles)})
    format_set <- hash()
-   
    for(formats in strsplit(supp_format_list, ", ")){
       for(f in formats){
          if(!has.key(f, format_set)){
@@ -21,7 +20,6 @@ showAllFileFormats <- function(recsum) {
          }
       }
    }
-   
    for(key in keys(format_set)){
       print(sprintf("%s: %d", key, format_set[[key]]))
    }
@@ -35,14 +33,18 @@ isSingleTaxon <- function(recsum){
 }
 
 
-
+# param: organism
+# return: results, esearch results
 getHTSeqResultsByOrganism <- function(organism){
    dataset_type <- "expression profiling by high throughput sequencing"
    return(getResults(organism, dataset_type))
 }
 
 
-
+# param: organism.
+# param: dataset_type, e.g. "expression profiling by high throughput sequencing", etc.
+# param: suppfile_type, e.g. CSV, TXT, TLS, etc.
+# return: results, esearch results
 getResults <- function(organism, dataset_type, suppfile_type = "") {
    organism <- paste(organism, "[Organism]")
    dataset_type <- paste(dataset_type, "[DataSet Type]")
