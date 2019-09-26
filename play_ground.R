@@ -65,7 +65,8 @@ getFileType<- function(fname){
 }
 
 
-getFileType("GSE12312_RAW.tar")
+invalid <- getFileType("GSE12312_RAW.tar")
+
 
 getFileType("GSE67722_minus1-diff.txt.gz")
 
