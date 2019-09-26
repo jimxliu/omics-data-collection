@@ -45,20 +45,24 @@ getHTSeqResultsByOrganism <- function(organism){
 # param: dataset_type, e.g. "expression profiling by high throughput sequencing", etc.
 # param: suppfile_type, e.g. CSV, TXT, TLS, etc.
 # return: results, esearch results
-getResults <- function(organism, dataset_type, suppfile_type = "") {
+getResults <- function(organism, dataset_type, suppfile_type = "", pub_date = "2019/01/01-2019/12/31") {
    organism <- paste(organism, "[Organism]")
    dataset_type <- paste(dataset_type, "[DataSet Type]")
+   date_string <- getPubDatesFromString(pub_date)
+   inputs <- c(organism, dataset_type, date_string)
    if(suppfile_type != ""){
       suppfile_type <- paste(suppfile_type, "[Supplementary Files]")
+      inputs <- c(inputs, suppfile_type)
    }
    # Form query
-   query <- paste(c(organism, dataset_type, suppfile_type), collapse = " AND ")
+   query <- paste(inputs, collapse = " AND ")
    
    # Search the first time to get number of GSE records
    # res <- entrez_search(db='gds', term=query, use_history=TRUE)
    
    # Search the second time set the max number of records to res$count 
    res <- entrez_search(db='gds', term=query ,retmax=99999999, use_history=TRUE)
+   
    return(res)
 }
 
@@ -126,5 +130,27 @@ getFileType<- function(fname){
       }
    } 
    return()
+}
+
+
+# param: uid, a string of digits returned from result$ids, e.g., 20012345
+# return: GSE accession number, e.g., GSE12345
+getAccessionFromID <- function(id){
+   num <- gsub("[1-9]+0+([1-9]+[0-9]*)$", "\\1", "200138028")
+   return(paste0("GSE",num))
+}
+
+# param: date_str, e.g., "2019/01/01-2019/12/31", "2019/09/01-present"
+# return: date_query, e.g., "2019/09/01 [Publication Date] : 3000 [Publication Date]"
+getPubDatesFromString <- function(date_str){
+   dates <- strsplit(date_str, "-")[[1]]
+   if(dates[1] == "present") {
+      dates[1] = "3000"
+   } 
+   if(dates[2] == "present") {
+      dates[2] = "3000"
+   }
+   date_query <- sprintf("%s [Publication Date] : %s [Publication Date]", dates[1], dates[2])
+   return(date_query)
 }
 
