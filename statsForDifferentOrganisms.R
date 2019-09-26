@@ -1,30 +1,29 @@
 library(rentrez)
-source("./util.R")
+source("./utilities.R")
 
 organisms <- c("Zea mays", "Saccharomyces cerevisiae", "Homo sapiens", "Mus musculus")
 
+
 organism <- "Mus musculus"
 
-results <- getHTSeqResultsByOrganism(organism)
-results$file
+results <- getHTSeqResultsByOrganism("Zea mays")
+results$count
 recsum <- entrez_summary(db='gds', id=results$ids)
 
-class(res)
+class(results$ids[1])
+class(1)
+
 count <- 0
 for(id in results$ids){
-   recsum <- entrez_summary(db='gds', id=id)
-   suppfiles <- extract_from_esummary(recsum, c('suppfile'))
-   if(!is.null(suppfiles) && length(suppfiles) > 0){
-      count = count + 1  
-   }
+   # recsum <- entrez_summary(db='gds', id=id)
+   # suppfiles <- extract_from_esummary(recsum, c('suppfile'))
+   # if(!is.null(suppfiles) && length(suppfiles) > 0){
+   #    count = count + 1  
+   # }
+      
 }
-id
 
-supp_format_list <- lapply(results$ids, function(id) {
-   recsum <- entrez_summary(db='gds', id=id)
-   suppfiles <- extract_from_esummary(recsum, c('suppfile'))
-   print(suppfiles)
-   return(suppfiles)})
+getPubDatesFromString("2019/01/01-present")
 
 
 showAllFileFormats(results)

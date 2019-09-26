@@ -48,7 +48,7 @@ getHTSeqResultsByOrganism <- function(organism){
 getResults <- function(organism, dataset_type, suppfile_type = "", pub_date = "2019/01/01-2019/12/31") {
    organism <- paste(organism, "[Organism]")
    dataset_type <- paste(dataset_type, "[DataSet Type]")
-   date_string <- getPubDatesFromString(pub_date)
+   date_string <- parseStrToPubDates(pub_date)
    inputs <- c(organism, dataset_type, date_string)
    if(suppfile_type != ""){
       suppfile_type <- paste(suppfile_type, "[Supplementary Files]")
@@ -135,14 +135,14 @@ getFileType<- function(fname){
 
 # param: uid, a string of digits returned from result$ids, e.g., 20012345
 # return: GSE accession number, e.g., GSE12345
-getAccessionFromID <- function(id){
+parseIdToAccession <- function(id){
    num <- gsub("[1-9]+0+([1-9]+[0-9]*)$", "\\1", "200138028")
    return(paste0("GSE",num))
 }
 
 # param: date_str, e.g., "2019/01/01-2019/12/31", "2019/09/01-present"
 # return: date_query, e.g., "2019/09/01 [Publication Date] : 3000 [Publication Date]"
-getPubDatesFromString <- function(date_str){
+parseStrToPubDates <- function(date_str){
    dates <- strsplit(date_str, "-")[[1]]
    if(dates[1] == "present") {
       dates[1] = "3000"

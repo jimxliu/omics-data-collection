@@ -71,6 +71,10 @@ invalid <- getFileType("GSE12312_RAW.tar")
 getFileType("GSE67722_minus1-diff.txt.gz")
 
 
+myList <- c("a")
+c(myList, "b")
 
+dates <- strsplit("2019/01/01-2019/12/31", "-")
+dates[[1]][2]
 
 
