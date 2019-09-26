@@ -25,13 +25,6 @@ showAllFileFormats <- function(results) {
    }
 }
 
-# param: recsum, esummary_list
-# return: a list of boolean, indexed by gse_id
-isSingleTaxon <- function(recsum){
-   my_list <- lapply(recsum, function(rec) length(unlist(strsplit(rec$taxon, "; "))) == 1)
-   return(my_list)
-}
-
 
 # param: organism
 # return: results, esearch results
