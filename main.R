@@ -58,6 +58,10 @@ for(num in gse_list){
    # dname <- paste0("./data/",gse)
    # dir.create(dname, recursive = TRUE)
    
+   # if(!isSingleTaxon(pd)){
+   #    next
+   # }
+   
    version <- getGenomeVersion(pd)
    if(is.null(version)) {
       next
@@ -65,7 +69,8 @@ for(num in gse_list){
    if(isSingleCell(pd)){
       next
    }
-   downloadValidFiles(gse)
+   
+   # downloadValidFiles(gse)
 }
 
 

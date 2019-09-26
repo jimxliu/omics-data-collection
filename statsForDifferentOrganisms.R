@@ -7,11 +7,8 @@ organisms <- c("Zea mays", "Saccharomyces cerevisiae", "Homo sapiens", "Mus musc
 organism <- "Mus musculus"
 
 results <- getHTSeqResultsByOrganism("Zea mays")
-results$count
-recsum <- entrez_summary(db='gds', id=results$ids)
 
-class(results$ids[1])
-class(1)
+results$count
 
 count <- 0
 for(id in results$ids){
@@ -20,23 +17,29 @@ for(id in results$ids){
    # if(!is.null(suppfiles) && length(suppfiles) > 0){
    #    count = count + 1  
    # }
-      
+   gse <- parseIdToAccession(id)
+   print(sprintf("Processing %s", gse))
+   eList <- tryCatch({ 
+      getGEO(gse)
+   }, error = function(e) {
+      print("Cannot fetch data, SKIP!")
+      return()
+   })
+   # if there is error fetching the data or has multiple organisms
+   if(is.null(eList) || length(eList) > 1) {
+      next
+   }
+   pd <- pData(eList[[1]])
+   if(organism == "Zea mays"){
+      version <- getGenomeVersion(pd)
+      if(is.null(version)) {
+         next
+      }
+   }
+   if(isSingleCell(pd)){
+      next
+   }
+   
+   # has valid data files?
+   
 }
-
-getPubDatesFromString("2019/01/01-present")
-
-
-showAllFileFormats(results)
-
-
-
-total <- length(recsum)
-
-for(organism in organisms){
-   recsum <- getHTSeqResultsByOrganism(organism)
-   total <- length(recsum)
-}
-
-
-gse_list <- extract_from_esummary(esummaries = recsum, elements = c("gse"))
-

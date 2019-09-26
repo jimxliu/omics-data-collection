@@ -19,16 +19,16 @@ isSingleCell <- function(pd) {
 }
 
 
-# Example using Single-Cell technique
-eList2 <- getGEO("GSE121039")
-eData2 <- eList2[[1]]
-pd2 <- pData(eData2)
-
-isSingleCell(pd2)
-
-# Example NOT using Single-Cell technique
-eList <- getGEO("GSE111250")
-eData <- eList[[1]]
-pd <- pData(eData)
-
-isSingleCell(pd)
+# # Example using Single-Cell technique
+# eList2 <- getGEO("GSE121039")
+# eData2 <- eList2[[1]]
+# pd2 <- pData(eData2)
+# 
+# isSingleCell(pd2)
+# 
+# # Example NOT using Single-Cell technique
+# eList <- getGEO("GSE111250")
+# eData <- eList[[1]]
+# pd <- pData(eData)
+# 
+# isSingleCell(pd)

@@ -1,5 +1,5 @@
 library(rentrez)
-
+library(GEOquery)
 source("./util.R")
 
 # Make a query
@@ -17,52 +17,7 @@ res <- entrez_search(db='gds', term=query ,retmax=res$count, use_history=TRUE)
 # Summary of returned records.
 recsum <- entrez_summary(db='gds', id=res$ids)
 
-# param: fname
-# return: file type: diff, norm, fpkm, rpkm, raw
-getFileType<- function(fname){
-   if(!grepl("_raw\\.tar$", fname, ignore.case = TRUE, perl = TRUE)) {
-      # Patterns
-      normalized <- "(?=.*normalized)"
-      raw <- "(?=.*raw)(?=.*count)"
-      fpkm <- "fpkm"
-      rpkm <- "rpkm"
-      diff <- "edgeR|cuffdiff|diff"
-      count <- "count"
-      
-      if(grepl(diff, fname, ignore.case = TRUE, perl = TRUE) )
-      {
-         return("diff")
-      }
-      else if(grepl(normalized, fname, ignore.case = TRUE, perl = TRUE) 
-         && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE)) 
-      {  # normalized counts
-         return("norm")
-      } 
-      
-      else if(grepl(fpkm, fname, ignore.case = TRUE, perl = TRUE) 
-              && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE))
-      {  
-         # print(paste(fname, "fpkm")) 
-         return("fpkm")
-      }
-      
-      else if(grepl(rpkm, fname, ignore.case = TRUE, perl = TRUE) 
-              && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE))
-      {
-         # print(paste(fname, "rpkm")) 
-         return("rpkm")
-      } 
-      
-      else if(grepl(raw, fname, ignore.case = TRUE, perl = TRUE) 
-              || grepl(count, fname, ignore.case = TRUE, perl = TRUE)) 
-         
-      {  
-         # raw counts 
-         return("raw")
-      }
-   } 
-   return()
-}
+
 
 
 invalid <- getFileType("GSE12312_RAW.tar")
@@ -77,4 +32,33 @@ c(myList, "b")
 dates <- strsplit("2019/01/01-2019/12/31", "-")
 dates[[1]][2]
 
+# eList <- getGEO("GSE64665")
+# eList <- getGEO("GSE128434")
+# eList <- getGEO("GSE138028")
+# eList <- getGEO("GSE136433")
+eList <- getGEO("GSE128395")
 
+eList <- tryCatch({ 
+   getGEO("GSE138028")
+}, error = function(e) {
+   print("Cannot fetch data, SKIP!")
+   return()
+})
+eList
+is.null(eList)
+
+
+length(eList)
+
+eData <- eList[[1]]
+pd <- pData(eData)
+pd$organism_ch1[[1]] == "Arabidopsis thaliana" 
+
+if(any(grepl("supplementary_file", names(pd), perl = TRUE, ignore.case = TRUE))){
+   print("it has supp")
+}
+
+if(TRUE){
+   xyz <- 1
+}
+xyz
