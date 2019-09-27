@@ -28,9 +28,9 @@ showAllFileFormats <- function(results) {
 
 # param: organism
 # return: results, esearch results
-getHTSeqResultsByOrganism <- function(organism){
+getHTSeqResultsByOrganism <- function(organism, pub_date = "2019/01/01-2019/12/31"){
    dataset_type <- "expression profiling by high throughput sequencing"
-   return(getResults(organism, dataset_type))
+   return(getResults(organism = organism, dataset_type = dataset_type, pub_date = pub_date))
 }
 
 
@@ -59,22 +59,31 @@ getResults <- function(organism, dataset_type, suppfile_type = "", pub_date = "2
    return(res)
 }
 
-# Function: download supp files for a GSE that follow certain naming patterns
-# Params: gse (GSE accession number)
-# Return: print out downloaed filenames
-downloadValidFiles <- function(gse) {
-   files <-  getGEOSuppFiles(gse, fetch_files = FALSE)
+# param: gse (GSE accession number), e.g., GSE123455
+# param: organism, e.g., "Homo sapiens", "Zea mays"
+# param: download, download the file(s) or not.
+# return: data.frame containing file name and url, or NULL
+getValidFiles <- function(gse, organism, download = FALSE) {
+   files <-  getGEOSuppFiles(gse, fetch_files = FALSE, makeDirectory = FALSE)
+   if(is.null(files)) return()
    files$fileType <- sapply(files$fname, getFileType)
+   invalidRows <- c()
    for(row in 1:nrow(files)) {
       fileType <- files$fileType[[row]]
       if(!is.null(fileType)){
-         url <- as.character(files[row, "url"])
-         fname <- as.character(files[row, "fname"])
-         download.file(url = url, destfile = paste0("./data/",fname))
-         print(paste("Downloaded.", "File Name:", fname, ", File Type:", fileType))
+         if(download){
+            url <- as.character(files[row, "url"])
+            fname <- as.character(files[row, "fname"])
+            destdir <- sprintf("./data/%s", gsub(" ", "_", organism))
+            downloadFile(url, fname,destdir)
+         }      
+      } else {
+         invalidRows <- c(invalidRows, row)
       }
    }
    
+   files <- if(length(invalidRows) > 0) files[-invalidRows,] else if(nrow(files) > 0) files else NULL
+   return(files)
 }
 
 
@@ -85,8 +94,8 @@ getFileType<- function(fname){
       # Patterns
       normalized <- "(?=.*normalized)"
       raw <- "(?=.*raw)(?=.*count)"
-      fpkm <- "fpkm"
-      rpkm <- "rpkm"
+      fpkm <- "fpkm|fragments.*per.*million"
+      rpkm <- "rpkm|reads.*per.*million"
       diff <- "edgeR|cuffdiff|diff"
       count <- "count"
       
@@ -125,17 +134,33 @@ getFileType<- function(fname){
    return()
 }
 
+# param: url, link to download the file
+# param: fname, file name
+# param: destdir, destination directory
+# return: stdout
+downloadFile <- function(url, fname, destdir){
+   tryCatch({
+      print(sprintf("Downloading %s", fname))
+      dir.create(destdir, showWarnings = FALSE)
+      download.file(url = url, destfile = sprintf("%s/%s", destdir, fname))
+      print("Done.")
+   }, error = function(e) {
+      print(sprintf("Failed. Error: %s", e))
+   }) 
+}
+
 
 # param: uid, a string of digits returned from result$ids, e.g., 20012345
 # return: GSE accession number, e.g., GSE12345
 parseIdToAccession <- function(id){
-   num <- gsub("[1-9]+0+([1-9]+[0-9]*)$", "\\1", "200138028")
+   num <- gsub("[1-9]+0+([1-9]+[0-9]*)$", "\\1", id)
    return(paste0("GSE",num))
 }
 
 # param: date_str, e.g., "2019/01/01-2019/12/31", "2019/09/01-present"
 # return: date_query, e.g., "2019/09/01 [Publication Date] : 3000 [Publication Date]"
 parseStrToPubDates <- function(date_str){
+   if(date_str == "") return("")
    dates <- strsplit(date_str, "-")[[1]]
    if(dates[1] == "present") {
       dates[1] = "3000"
