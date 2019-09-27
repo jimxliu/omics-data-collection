@@ -1,6 +1,6 @@
 library(rentrez)
 library(GEOquery)
-source("./util.R")
+source("./utilities.R")
 
 # Make a query
 organism <- "Zea mays [Organism]"
@@ -62,3 +62,23 @@ if(TRUE){
    xyz <- 1
 }
 xyz
+
+gse <- "GSE138028"
+eList <- tryCatch({ 
+   getGEO(gse)
+}, error = function(e) {
+   print("Cannot fetch data, SKIP!")
+   NULL
+})
+
+eList
+
+files <- getValidFiles(gse = "GSE136433", organism = "Homo sapiens")
+
+files <-  getGEOSuppFiles("GSE109281", fetch_files = FALSE)
+files
+rows <- c(5)
+length(rows)
+df <- files[-rows,]
+df
+files
