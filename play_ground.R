@@ -1,84 +1,52 @@
-library(rentrez)
-library(GEOquery)
 source("./utilities.R")
 
-# Make a query
-organism <- "Zea mays [Organism]"
-datatype <- "expression profiling by high throughput sequencing [DataSet Type]"
-suppfiles <- "(CSV [Supplementary Files])"
-query <- paste(c(organism, datatype), collapse = " AND ")
+results <- getHTSeqResultsByOrganism(organism = "Homo sapiens")
 
-# Search the first time to get number of GSE records
-res <- entrez_search(db='gds', term=query, use_history=TRUE)
-
-# Search the second time set the max number of records to res$count 
-res <- entrez_search(db='gds', term=query ,retmax=res$count, use_history=TRUE)
-
-# Summary of returned records.
-recsum <- entrez_summary(db='gds', id=res$ids)
-
-
-
-
-invalid <- getFileType("GSE12312_RAW.tar")
-
-
-getFileType("GSE67722_minus1-diff.txt.gz")
-
-
-myList <- c("a")
-c(myList, "b")
-
-dates <- strsplit("2019/01/01-2019/12/31", "-")
-dates[[1]][2]
-
-# eList <- getGEO("GSE64665")
-# eList <- getGEO("GSE128434")
-# eList <- getGEO("GSE138028")
-# eList <- getGEO("GSE136433")
-eList <- getGEO("GSE128395")
-
-eList <- tryCatch({ 
-   getGEO("GSE138028")
-}, error = function(e) {
-   print("Cannot fetch data, SKIP!")
-   return()
-})
-eList
-is.null(eList)
-
-
-length(eList)
-
-eData <- eList[[1]]
-pd <- pData(eData)
-pd$organism_ch1[[1]] == "Arabidopsis thaliana" 
-
-if(any(grepl("supplementary_file", names(pd), perl = TRUE, ignore.case = TRUE))){
-   print("it has supp")
+batch <- 325
+n <- ceiling(results$count / batch)
+count <- 0
+gse_list <- c()
+for(i in 1:n){
+   start <- (i - 1) * batch + 1
+   end <-  min(i * batch, results$count)
+   print(sprintf("start: %d, end: %d", start, end))
+   esummaries <- entrez_summary(db="gds", id=results$ids[start:end])
+   for(esum in esummaries){
+      
+      # Ignore GSE containing multipl organisms
+      if(length(strsplit(esum$taxon, ";")[[1]]) > 1){
+         next
+      }
+      gse <- paste0("GSE",esum$gse)
+      eList <- tryCatch({
+         getGEO(gse, getGPL = FALSE)
+      }, error = function(e) {
+         print(e)
+         NULL
+      })
+      if(is.null(eList)){
+         next
+      }
+      pd <- pData(eList[[1]])
+      if(organism == "Zea mays"){
+         version <- getGenomeVersion(pd)
+         if(is.null(version)) {
+            next
+         }
+      }
+      if(isSingleCell(pd)){
+         next
+      }
+      
+      # has valid data files?
+      files <- getValidFiles(gse = gse, organism = organism)
+      if(!is.null(files)){
+         count <- count + 1
+         gse_list <- c(gse_list, gse)
+      }
+   }
+   break
 }
 
-if(TRUE){
-   xyz <- 1
-}
-xyz
-
-gse <- "GSE138028"
-eList <- tryCatch({ 
-   getGEO(gse)
-}, error = function(e) {
-   print("Cannot fetch data, SKIP!")
-   NULL
-})
-
-eList
-
-files <- getValidFiles(gse = "GSE136433", organism = "Homo sapiens")
-
-files <-  getGEOSuppFiles("GSE109281", fetch_files = FALSE)
-files
-rows <- c(5)
-length(rows)
-df <- files[-rows,]
-df
-files
+write(count, file = "output.txt", append = FALSE)
+write(gse_list, file = "output.txt", append = TRUE)

@@ -28,7 +28,7 @@ showAllFileFormats <- function(results) {
 
 # param: organism
 # return: results, esearch results
-getHTSeqResultsByOrganism <- function(organism, pub_date = "2019/01/01-2019/12/31"){
+getHTSeqResultsByOrganism <- function(organism, pub_date = ""){
    dataset_type <- "expression profiling by high throughput sequencing"
    return(getResults(organism = organism, dataset_type = dataset_type, pub_date = pub_date))
 }
@@ -37,12 +37,16 @@ getHTSeqResultsByOrganism <- function(organism, pub_date = "2019/01/01-2019/12/3
 # param: organism.
 # param: dataset_type, e.g. "expression profiling by high throughput sequencing", etc.
 # param: suppfile_type, e.g. CSV, TXT, TLS, etc.
+# param: pub_date, publication date, e.g., "2019/01/01-2019/12/31", or "2019/01/01-present"
 # return: results, esearch results
-getResults <- function(organism, dataset_type, suppfile_type = "", pub_date = "2019/01/01-2019/12/31") {
+getResults <- function(organism, dataset_type, suppfile_type = "", pub_date = "") {
    organism <- paste(organism, "[Organism]")
    dataset_type <- paste(dataset_type, "[DataSet Type]")
-   date_string <- parseStrToPubDates(pub_date)
-   inputs <- c(organism, dataset_type, date_string)
+   inputs <- c(organism, dataset_type)
+   if(pub_date != ""){
+      date_string <- parseStrToPubDates(pub_date)
+      inputs <- c(inputs, date_string)
+   }
    if(suppfile_type != ""){
       suppfile_type <- paste(suppfile_type, "[Supplementary Files]")
       inputs <- c(inputs, suppfile_type)
@@ -82,17 +86,28 @@ getValidFiles <- function(gse, organism, download = FALSE) {
       }
    }
    
-   files <- if(length(invalidRows) > 0) files[-invalidRows,] else if(nrow(files) > 0) files else NULL
-   return(files)
+   if(nrow(files) > length(invalidRows)){
+      
+   }
+   
+   if(length(invalidRows) > 0) { 
+      files <- files[-invalidRows,] 
+   }
+   if(nrow(files) > 0){
+      return(files)
+   } else {
+      return()
+   }
 }
 
 
 # param: fname
 # return: file type: diff, norm, fpkm, rpkm, raw
 getFileType<- function(fname){
-   if(!grepl("_raw\\.tar$", fname, ignore.case = TRUE, perl = TRUE)) {
+   if(!grepl("_raw\\.tar$", fname, ignore.case = TRUE, perl = TRUE) && 
+      !grepl("\\.xlsx", fname, ignore.case = TRUE, perl = TRUE)) {
       # Patterns
-      normalized <- "(?=.*normalized)"
+      # normalized <- "(?=.*normalized)"
       raw <- "(?=.*raw)(?=.*count)"
       fpkm <- "fpkm|fragments.*per.*million"
       rpkm <- "rpkm|reads.*per.*million"
@@ -103,11 +118,11 @@ getFileType<- function(fname){
       {
          return("diff")
       }
-      else if(grepl(normalized, fname, ignore.case = TRUE, perl = TRUE) 
-              && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE)) 
-      {  # normalized counts
-         return("norm")
-      } 
+      # else if(grepl(normalized, fname, ignore.case = TRUE, perl = TRUE) 
+      #         && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE)) 
+      # {  # normalized counts
+      #    return("norm")
+      # } 
       
       else if(grepl(fpkm, fname, ignore.case = TRUE, perl = TRUE) 
               && !grepl(raw, fname, ignore.case = TRUE, perl = TRUE))
