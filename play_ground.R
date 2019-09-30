@@ -1,6 +1,7 @@
 source("./utilities.R")
 
-results <- getHTSeqResultsByOrganism(organism = "Homo sapiens")
+oranism <- "Homo sapiens"
+results <- getHTSeqResultsByOrganism(organism = organism)
 
 batch <- 325
 n <- ceiling(results$count / batch)
