@@ -1,6 +1,8 @@
 source("./utilities.R")
+source("./getGenomeVersion.R")
+source("./isSingleCell.R")
 
-oranism <- "Homo sapiens"
+organism <- "Homo sapiens"
 results <- getHTSeqResultsByOrganism(organism = organism)
 
 batch <- 325
@@ -46,7 +48,6 @@ for(i in 1:n){
          gse_list <- c(gse_list, gse)
       }
    }
-   break
 }
 
 write(count, file = "output.txt", append = FALSE)
