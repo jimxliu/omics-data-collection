@@ -4,4 +4,7 @@
 .Ruserdata
 /data
 /temp
+/tmpData
+/logs
+/output
 GSE*
