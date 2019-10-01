@@ -28,9 +28,9 @@ showAllFileFormats <- function(results) {
 
 # param: organism
 # return: results, esearch results
-getHTSeqResultsByOrganism <- function(organism, pub_date = ""){
+getHTSeqResultsByOrganism <- function(organism, retstart = 0, retmax = 0, pub_date = ""){
    dataset_type <- "expression profiling by high throughput sequencing"
-   return(getResults(organism = organism, dataset_type = dataset_type, pub_date = pub_date))
+   return(getResults(organism = organism, dataset_type = dataset_type, pub_date = pub_date, retstart = retstart, retmax = retmax))
 }
 
 
@@ -39,7 +39,7 @@ getHTSeqResultsByOrganism <- function(organism, pub_date = ""){
 # param: suppfile_type, e.g. CSV, TXT, TLS, etc.
 # param: pub_date, publication date, e.g., "2019/01/01-2019/12/31", or "2019/01/01-present"
 # return: results, esearch results
-getResults <- function(organism, dataset_type, suppfile_type = "", pub_date = "") {
+getResults <- function(organism, dataset_type, suppfile_type = "", pub_date = "", retstart = 0, retmax = 0) {
    organism <- paste(organism, "[Organism]")
    dataset_type <- paste(dataset_type, "[DataSet Type]")
    inputs <- c(organism, dataset_type)
@@ -53,14 +53,19 @@ getResults <- function(organism, dataset_type, suppfile_type = "", pub_date = ""
    }
    # Form query
    query <- paste(inputs, collapse = " AND ")
+   res <- NULL 
+   if(retstart >= 0 && retstart < retmax) {
+      res <- entrez_search(db='gds', term=query ,retstart=retstart,retmax=retmax, use_history=TRUE)
+      return(res)
+   } else {
+      # Search the first time to get number of GSE records
+      res <- entrez_search(db='gds', term=query, use_history=TRUE)
    
-   # Search the first time to get number of GSE records
-   # res <- entrez_search(db='gds', term=query, use_history=TRUE)
+      # Search the second time set the max number of records to res$count 
+      res <- entrez_search(db='gds', term=query ,retmax=res$count, use_history=TRUE)
    
-   # Search the second time set the max number of records to res$count 
-   res <- entrez_search(db='gds', term=query ,retmax=99999999, use_history=TRUE)
-   
-   return(res)
+      return(res)
+   }
 }
 
 # param: gse (GSE accession number), e.g., GSE123455
