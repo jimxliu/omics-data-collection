@@ -73,8 +73,12 @@ getResults <- function(organism, dataset_type, suppfile_type = "", pub_date = ""
 # param: download, download the file(s) or not.
 # return: data.frame containing file name and url, or NULL
 getValidFiles <- function(gse, organism, download = FALSE) {
-   files <-  getGEOSuppFiles(gse, fetch_files = FALSE, makeDirectory = FALSE)
-   if(is.null(files)) return()
+   files <- tryCatch({getGEOSuppFiles(gse, fetch_files = FALSE, makeDirectory = FALSE)},
+                      error = function(e) {
+                          print(paste("getGEOSuppFiles Error:", e))
+                          return(NULL)  
+                     })    
+   if(is.null(files)) return(NULL)
    files$fileType <- sapply(files$fname, getFileType)
    invalidRows <- c()
    for(row in 1:nrow(files)) {
@@ -91,17 +95,13 @@ getValidFiles <- function(gse, organism, download = FALSE) {
       }
    }
    
-   if(nrow(files) > length(invalidRows)){
-      
-   }
-   
    if(length(invalidRows) > 0) { 
       files <- files[-invalidRows,] 
    }
    if(nrow(files) > 0){
       return(files)
    } else {
-      return()
+      return(NULL)
    }
 }
 
