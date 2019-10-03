@@ -4,17 +4,15 @@ source("./isSingleCell.R")
 
 organism <- "Homo sapiens"
 results <- getHTSeqResultsByOrganism(organism = organism)
-total <- results$count
 count <- 0
-batch <- 200
+batch <- 150
 n <- ceiling(results$count / batch)
 outfile <- paste0("output/", tolower(gsub(" ", "_", organism)), ".out")
 for(i in 1:n){
-   start <- (i - 1) * batch
-   print(sprintf("start: %d", start))
-   results <- NULL 
-   results <- getHTSeqResultsByOrganism(organism = organism, retstart = start, retmax=batch)
-   esummaries <- entrez_summary(db="gds", id=results$ids)
+   start <- (i - 1) * batch + 1
+   end <-  min(i * batch, results$count)
+   print(sprintf("start: %d, end: %d", start, end))
+   esummaries <- entrez_summary(db="gds", id=results$ids[start:end])
    for(esum in esummaries){
       
       # Ignore GSE containing multipl organisms

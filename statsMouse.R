@@ -5,7 +5,7 @@ source("./isSingleCell.R")
 organism <- "Mus musculus"
 results <- getHTSeqResultsByOrganism(organism = organism)
 count <- 0
-batch <- 200
+batch <- 150
 n <- ceiling(results$count / batch)
 outfile <- paste0("output/", tolower(gsub(" ", "_", organism)), ".out")
 for(i in 1:n){
