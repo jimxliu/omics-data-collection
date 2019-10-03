@@ -78,7 +78,7 @@ getValidFiles <- function(gse, organism, download = FALSE) {
                           print(paste("getGEOSuppFiles Error:", e))
                           return(NULL)  
                      })    
-   if(is.null(files)) return(NULL)
+   if(is.null(files) || nrow(files) == 0) return(NULL)
    files$fileType <- sapply(files$fname, getFileType)
    invalidRows <- c()
    for(row in 1:nrow(files)) {
