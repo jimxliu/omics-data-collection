@@ -87,7 +87,7 @@ getValidFiles <- function(gse, organism, download = FALSE) {
          if(download){
             url <- as.character(files[row, "url"])
             fname <- as.character(files[row, "fname"])
-            destdir <- sprintf("./data/%s", gsub(" ", "_", organism))
+            destdir <- sprintf("./data/%s", gsub(" ", "_", tolower(organism)))
             downloadFile(url, fname,destdir)
          }      
       } else {
