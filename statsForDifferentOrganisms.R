@@ -2,7 +2,8 @@ library(rentrez)
 source("./utilities.R")
 source("./getGenomeVersion.R")
 
-organisms <- c("Zea mays", "Saccharomyces cerevisiae", "Mus musculus", "Arabidopsis thaliana", "Glycine max", "Canis lupus familiaris", "Felis catus", "Escherichia coli", "Influenza A virus")
+# organisms <- c("Homo sapiens", "Zea mays", "Saccharomyces cerevisiae", "Mus musculus", "Arabidopsis thaliana", "Glycine max", "Canis lupus familiaris", "Felis catus", "Escherichia coli", "Influenza A virus")
+organisms <- c("Arabidopsis thaliana", "Glycine max", "Canis lupus familiaris", "Felis catus", "Escherichia coli", "Influenza A virus", "Mus musculus")
 
 for(organism in organisms){
    tryCatch({
@@ -53,3 +54,4 @@ for(organism in organisms){
       }
    }
 }
+print("All done!")
