@@ -7,4 +7,5 @@
 /tmpData
 /logs
 /output
+/code/*.pyc
 GSE*
