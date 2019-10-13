@@ -162,7 +162,11 @@ downloadFile <- function(url, fname, destdir){
    tryCatch({
       print(sprintf("Downloading %s", fname))
       dir.create(destdir, showWarnings = FALSE)
-      download.file(url = url, destfile = sprintf("%s/%s", destdir, fname))
+      destfile = sprintf("%s/%s", destdir, fname) 
+      download.file(url = url, destfile = destfile)
+      if(grepl("\\.gz$", fname, ignore.case=TRUE, perl=TRUE)){
+         gunzip(destfile, overwrite = TRUE, remove = TRUE)
+      }
       print("Done.")
    }, error = function(e) {
       print(sprintf("Failed. Error: %s", e))
