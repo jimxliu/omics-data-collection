@@ -21,7 +21,7 @@ path = "../data/" + organism
 #fname = "../data/zea_mays/GSE50191_FPKM.tsv"
 #fname = "../data/zea_mays/GSE67550_FPKM_table.txt"
 
-def processFPKM(fname):
+def processFPKM(fname, rpkm=False):
    df = loadData(fname)
    if df is None:
       return None
@@ -46,7 +46,10 @@ def processFPKM(fname):
       # data_cols: fpkm data columns
       data_cols = df.columns.tolist()[start:end+1]
       # Only eep column names containing FPKM. If none, use the original data_cols
-      fpkm_cols = [col for col in data_cols if re.search("fpkm", col.lower())]
+      if rpkm:
+         fpkm_cols = [col for col in data_cols if re.search("rpkm", col.lower())]
+      else:
+         fpkm_cols = [col for col in data_cols if re.search("fpkm", col.lower())]
       data_cols = [col for col in data_cols if "length" not in col.lower()] if not fpkm_cols else fpkm_cols
       # Rearrange columns
       new_cols = ["GeneID"] + data_cols
@@ -78,5 +81,5 @@ def processFPKM(fname):
 #            print df.head()
 #            print
          
-df = processFPKM("../data/zea_mays/GSE71723_transcript_fpkms.txt")            
+df = processFPKM("../data/zea_mays/GSE38413_Maize_Pericarp_25DAP_mRNA-Seq_genes.fpkm_tracking")            
 print df.head()
