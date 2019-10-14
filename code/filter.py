@@ -30,6 +30,7 @@ def processFPKM(fname):
    gene_id_col = None
    for col in df.columns:
       if df.dtypes[col] == "O":      
+         # Check the first 10 rows of the column whether match gene id pattern
          series = df.loc[:10, col]
          if series.str.contains(gene_id_pattern, regex = True).any():
             # Extract the column data as a Series.
@@ -53,7 +54,8 @@ def processFPKM(fname):
       df["GeneID"] = gene_id_col
       df = df[new_cols]
       # Replace characters that are not [0-9a-zA-Z_] in the column names with "_"
-      df = df.rename(mapper = lambda x: re.sub("[^0-9a-zA-Z_]+", "_", x), axis = "columns")
+      rObj = re.compile("[^0-9a-zA-Z_]+")
+      df = df.rename(mapper = lambda x: rObj.sub("_", x), axis = "columns")
       # Remove rows containing NaN
       df = df.dropna()
       return df
